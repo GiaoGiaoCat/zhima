@@ -1,0 +1,27 @@
+@startuml "activity"
+
+start
+
+:GetIP();
+if (内存中存在代理对象?) then (yes)
+else (no)
+  while (通过 API 提取 IP) is (failure)
+    if (失败次数小于3) then (yes)
+      :失败次数+1;
+    else (no)
+      :return error;
+      stop
+    endif
+  endwhile (success)
+  :代理对象写入内存;
+endif
+
+if (对象过期) then (yes)
+  :重新执行 GetIP();
+else (no)
+endif
+
+:return ip string;
+stop
+
+@enduml
