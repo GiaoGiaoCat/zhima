@@ -8,7 +8,7 @@
 
 在个人中心添加 IP 白名单，否则取不到结果。**芝麻HTTP** 是根据请求 IP 来关联账户进行余额消耗的。获取 IP 不收费，使用才收费。
 
-目前只支持一次获取 1 个 IP，IP 的有效时长固定为 25 分钟至 3 小时，代理形式是 HTTP。
+目前只支持一次获取 1 个 IP，IP 的有效时长固定为 5 分钟至 25 分钟，代理形式是 HTTP。
 
 ## 参数
 
@@ -39,3 +39,67 @@
 | sb      | 自定义分隔符                                  |
 
 ## HowTo
+
+无头浏览器挂上代理，来个截图。
+
+```bash
+go get github.com/GiaoGiaoCat/zhima
+```
+
+```go
+package main
+
+import (
+  "context"
+  "io/ioutil"
+  "log"
+  "time"
+
+  zhima "github.com/GiaoGiaoCat/zhima"
+  "github.com/chromedp/chromedp"
+)
+
+func main() {
+
+  var buf []byte
+
+  options := zhima.Options{Pro: 0, City: 0, YYS: 0, MR: 1, PB: 4}
+  proxy, err := zhima.GetIP(options)
+
+  if err != nil {
+    return
+  }
+
+  // user proxy
+  o := append(chromedp.DefaultExecAllocatorOptions[:],
+    chromedp.ProxyServer(proxy),
+  )
+
+  cx, cancel := chromedp.NewExecAllocator(context.Background(), o...)
+  defer cancel()
+
+  // create chrome instance
+  ctx, cancel := chromedp.NewContext(
+    cx,
+    // context.Background(),
+    chromedp.WithLogf(log.Printf),
+  )
+  defer cancel()
+
+  // create a timeout
+  ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
+  defer cancel()
+
+  err = chromedp.Run(ctx,
+    chromedp.Navigate(`https://www.123cha.com/`),
+    chromedp.Sleep(5*time.Second),
+    chromedp.CaptureScreenshot(&buf),
+  )
+  if err != nil {
+    log.Fatal(err)
+  }
+  if err := ioutil.WriteFile("fullScreenshot.png", buf, 0644); err != nil {
+    log.Fatal(err)
+  }
+}
+```

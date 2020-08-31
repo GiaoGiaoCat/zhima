@@ -12,7 +12,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-const URL = "http://http.tiqu.alicdns.com/getip3?num=1&type=2&port=1&time=2&ts=1&ys=0&cs=0&lb=1&sb=0"
+const URL = "http://http.tiqu.alicdns.com/getip3?num=1&type=2&port=1&time=1&ts=1&ys=0&cs=0&lb=1&sb=0"
 
 type Options struct {
 	Pro  int `url:"pro"`
