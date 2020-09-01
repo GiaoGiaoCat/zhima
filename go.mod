@@ -2,4 +2,7 @@ module github.com/GiaoGiaoCat/zhima
 
 go 1.15
 
-require github.com/google/go-querystring v1.0.0 // indirect
+require (
+	github.com/chromedp/chromedp v0.5.3
+	github.com/google/go-querystring v1.0.0
+)
