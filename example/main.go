@@ -13,8 +13,8 @@ import (
 
 func main() {
 	var buf []byte
-
-	options := zhima.Options{Pro: 0, City: 0, YYS: 0, MR: 1, PB: 4, Time: 1, Port: 1}
+	// 全国，所有城市，线路不限，不去重，端口4位，稳定时长5-25分钟，协议HTTP
+	options := zhima.Options{Pro: 0, City: 0, YYS: 0, MR: 3, PB: 4, Time: 1, Port: 1}
 	proxy, err := zhima.GetProxy(options)
 	if err != nil {
 		return
@@ -52,9 +52,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := ioutil.WriteFile("fullScreenshot.png", buf, 0644); err != nil {
+	if err := ioutil.WriteFile("fullScreenshot.png", buf, 0600); err != nil {
 		log.Fatal(err)
 	}
-
-	return
 }
