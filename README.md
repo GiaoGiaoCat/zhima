@@ -1,5 +1,6 @@
 # zhima - 使用芝麻代理
 
+![GolangCI-Linter](https://github.com/GiaoGiaoCat/zhima/workflows/GolangCI-Linter/badge.svg?branch=master)
 [![Dependabot](https://api.dependabot.com/badges/status?host=github&repo=GiaoGiaoCat/zhima&identifier=291636251)](https://app.dependabot.com/accounts/GiaoGiaoCat/repos/291636251)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GiaoGiaoCat/zhima)](https://goreportcard.com/report/github.com/GiaoGiaoCat/zhima)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/GiaoGiaoCat/zhima?color=%2300acd7)
