@@ -5,6 +5,8 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/GiaoGiaoCat/zhima?color=%2300acd7)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/GiaoGiaoCat/zhima)
 
+<img align="right" width="100px" src="./assets/icon.png">
+
 方便在 golang 项目中使用 [芝麻HTTP](http://h.zhimaruanjian.com/) 获取代理。
 
 **先去 芝麻HTTP 注册账号，根据自己的使用情况充值一波。** 在个人中心添加 IP 白名单，否则取不到结果。**芝麻HTTP** 是根据请求 API 时的来源 IP 所关联账户进行余额消耗的。获取 IP 不收费，使用才收费。
