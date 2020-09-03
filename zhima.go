@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -47,6 +48,11 @@ func GetProxy(opt Options) (proxy Proxy, err error) {
 		return
 	}
 
+	// read all response body
+	// data, _ := ioutil.ReadAll(resp.Body)
+	// log.Println(data)
+	// fmt.Printf("%s\n", data)
+
 	// Close response body
 	defer resp.Body.Close()
 	proxy, err = decoder(resp.Body)
@@ -63,6 +69,11 @@ func decoder(body io.Reader) (proxy Proxy, err error) {
 	err = json.NewDecoder(body).Decode(&resBody)
 	if err != nil {
 		return
+	}
+
+	if !resBody.Success {
+		// nolinter
+		return proxy, errors.New(resBody.Msg)
 	}
 
 	proxy = resBody.Data[0]
