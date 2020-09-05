@@ -47,7 +47,6 @@ import (
 )
 
 func main() {
-  var buf []byte
   // 北京，北京市，线路不限，不去重，端口4位，稳定时长5-25分钟，协议HTTP
   options := zhima.Options{Pro: 110000, City: 110105, YYS: 0, MR: 3, PB: 4, Time: 1, Port: 1}
   proxy, err := zhima.GetProxy(options)
