@@ -58,3 +58,8 @@ func main() {
   return
 }
 ```
+
+## 参考
+
+* [Go语言检测代理IP](https://www.jianshu.com/p/ba1c727ea6d9)
+* [go语言批量检测代理ip是否可用](https://blog.csdn.net/qq_32502511/article/details/90044202)
