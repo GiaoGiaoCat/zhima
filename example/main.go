@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	zhima "github.com/GiaoGiaoCat/zhima"
+	"github.com/GiaoGiaoCat/zhima"
 	"github.com/chromedp/chromedp"
 )
 
@@ -17,10 +17,15 @@ func main() {
 	options := zhima.Options{Pro: 0, City: 0, YYS: 0, MR: 3, PB: 4, Time: 1, Port: 1}
 	proxy, err := zhima.GetProxy(options)
 	if err != nil {
+		fmt.Printf("%+v\n", err)
 		return
 	}
 
-	speed, status := zhima.TestProxy(proxy)
+	speed, status, err := zhima.TestProxy(proxy)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		return
+	}
 	fmt.Printf("speed %d ms, status %d\n", speed, status)
 
 	proxyAddr := fmt.Sprintf("http://%s:%d", proxy.IP, proxy.Port)

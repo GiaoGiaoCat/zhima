@@ -2,16 +2,13 @@ package zhima
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/google/go-querystring/query"
 	"github.com/pkg/errors"
 )
 
@@ -47,9 +44,9 @@ type Response struct {
 }
 
 func GetProxy(opt Options) (proxy Proxy, err error) {
-	resp, err := send(bytes.NewBuffer(nil), &opt)
+	httpClient := http.DefaultClient
+	resp, err := send(httpClient, URL, bytes.NewBuffer(nil), &opt)
 	if err != nil {
-		log.Println(err)
 		return
 	}
 
@@ -62,47 +59,46 @@ func GetProxy(opt Options) (proxy Proxy, err error) {
 	defer resp.Body.Close()
 	proxy, err = decoder(resp.Body)
 	if err != nil {
-		log.Println(err)
 		return
 	}
 
 	return proxy, nil
 }
 
-func TestProxy(proxy Proxy) (speed, status int) {
+func TestProxy(proxy Proxy) (speed, status int, err error) {
 	// 解析代理地址
 	proxyAddr, err := url.Parse(fmt.Sprintf("http://%s:%d", proxy.IP, proxy.Port))
 	if err != nil {
-		fmt.Println(err)
-		return 0, 0
+		return
 	}
+
 	// 设置网络传输.
 	netTransport := &http.Transport{
 		Proxy:                 http.ProxyURL(proxyAddr),
 		MaxIdleConnsPerHost:   10,
 		ResponseHeaderTimeout: time.Second * time.Duration(5),
 	}
+
 	// 创建连接客户端
 	httpClient := &http.Client{
 		Timeout:   time.Second * 10,
 		Transport: netTransport,
 	}
-	begin := time.Now() // 判断代理访问时间
-	// 使用代理IP访问测试地址
-	res, err := httpClient.Get(SpeedTestURL)
+
+	begin := time.Now()                                                          // 判断代理访问时间
+	res, err := send(httpClient, SpeedTestURL, bytes.NewBuffer(nil), &Options{}) // 使用代理IP访问测试地址
 	if err != nil {
-		fmt.Println(err)
-		return 0, 0
+		return
 	}
 	defer res.Body.Close()
 
-	speed = int(time.Since(begin).Nanoseconds() / 1000 / 1000) // ms
-	// 判断是否成功访问，如果成功访问 StatusCode 应该为 200
+	speed = int(time.Since(begin).Nanoseconds() / 1000 / 1000) // 单位 ms
+
 	if res.StatusCode != http.StatusOK {
-		fmt.Println(err)
 		return
 	}
-	return speed, res.StatusCode
+
+	return speed, res.StatusCode, nil
 }
 
 func decoder(body io.Reader) (proxy Proxy, err error) {
@@ -113,35 +109,9 @@ func decoder(body io.Reader) (proxy Proxy, err error) {
 	}
 
 	if !resBody.Success {
-		// nolinter
 		return proxy, errors.New(resBody.Msg)
 	}
 
 	proxy = resBody.Data[0]
 	return proxy, nil
-}
-
-func send(body io.Reader, opt *Options) (*http.Response, error) {
-	return sendWithContext(context.Background(), body, opt)
-}
-
-// Sending an HTTP request and accepting context.
-func sendWithContext(ctx context.Context, body io.Reader, opt *Options) (*http.Response, error) {
-	v, _ := query.Values(opt)
-
-	// fmt.Print(v.Encode()) will output: "city=0&mr=1&pb=4&pro=0&yys=0"
-	APIEndpoint := fmt.Sprintf("%s&%s", URL, v.Encode())
-	fmt.Println(APIEndpoint)
-	// Change NewRequest to NewRequestWithContext and pass context it
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, APIEndpoint, body)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
