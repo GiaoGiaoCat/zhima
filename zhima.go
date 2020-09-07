@@ -52,17 +52,10 @@ func GetProxy(opt Options) (proxy Proxy, err error) {
 
 	// read all response body
 	// data, _ := ioutil.ReadAll(resp.Body)
-	// log.Println(data)
 	// fmt.Printf("%s\n", data)
-
-	// Close response body
 	defer resp.Body.Close()
-	proxy, err = decoder(resp.Body)
-	if err != nil {
-		return
-	}
 
-	return proxy, nil
+	return decoder(resp.Body)
 }
 
 func TestProxy(proxy Proxy) (speed, status int, err error) {
