@@ -4,16 +4,21 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
+	"time"
 
 	"github.com/google/go-querystring/query"
+	"github.com/pkg/errors"
 )
 
-const URL = "http://http.tiqu.alicdns.com/getip3?num=1&type=2&ts=1&ys=1&cs=1&lb=1&sb=0"
+const (
+	URL          = "http://http.tiqu.alicdns.com/getip3?num=1&type=2&ts=1&ys=1&cs=1&lb=1&sb=0"
+	SpeedTestURL = "http://proxies.site-digger.com/proxy-detect/"
+)
 
 type Options struct {
 	Pro  int `url:"pro"`  // 省份，默认全国
@@ -62,6 +67,42 @@ func GetProxy(opt Options) (proxy Proxy, err error) {
 	}
 
 	return proxy, nil
+}
+
+func TestProxy(proxy Proxy) (speed, status int) {
+	// 解析代理地址
+	proxyAddr, err := url.Parse(fmt.Sprintf("http://%s:%d", proxy.IP, proxy.Port))
+	if err != nil {
+		fmt.Println(err)
+		return 0, 0
+	}
+	// 设置网络传输.
+	netTransport := &http.Transport{
+		Proxy:                 http.ProxyURL(proxyAddr),
+		MaxIdleConnsPerHost:   10,
+		ResponseHeaderTimeout: time.Second * time.Duration(5),
+	}
+	// 创建连接客户端
+	httpClient := &http.Client{
+		Timeout:   time.Second * 10,
+		Transport: netTransport,
+	}
+	begin := time.Now() // 判断代理访问时间
+	// 使用代理IP访问测试地址
+	res, err := httpClient.Get(SpeedTestURL)
+	if err != nil {
+		fmt.Println(err)
+		return 0, 0
+	}
+	defer res.Body.Close()
+
+	speed = int(time.Since(begin).Nanoseconds() / 1000 / 1000) // ms
+	// 判断是否成功访问，如果成功访问 StatusCode 应该为 200
+	if res.StatusCode != http.StatusOK {
+		fmt.Println(err)
+		return
+	}
+	return speed, res.StatusCode
 }
 
 func decoder(body io.Reader) (proxy Proxy, err error) {

@@ -13,12 +13,15 @@ import (
 
 func main() {
 	var buf []byte
-	// 全国，所有城市，线路不限，不去重，端口4位，稳定时长5-25分钟，协议HTTP
+	// 全国，所有城市，线路不限，不去重，端口4位，稳定时长 5-25 分钟，协议 HTTP
 	options := zhima.Options{Pro: 0, City: 0, YYS: 0, MR: 3, PB: 4, Time: 1, Port: 1}
 	proxy, err := zhima.GetProxy(options)
 	if err != nil {
 		return
 	}
+
+	speed, status := zhima.TestProxy(proxy)
+	fmt.Printf("speed %d ms, status %d\n", speed, status)
 
 	proxyAddr := fmt.Sprintf("http://%s:%d", proxy.IP, proxy.Port)
 	// println(proxyAddr)
