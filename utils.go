@@ -11,7 +11,7 @@ import (
 )
 
 func send(httpClient *http.Client, url string, body io.Reader, opt *Options) (*http.Response, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
 	return sendWithContext(ctx, httpClient, url, body, opt)
