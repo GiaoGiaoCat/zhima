@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/google/go-querystring/query"
 )
 
 func send(httpClient *http.Client, url string, body io.Reader, opt *Options) (*http.Response, error) {
-	return sendWithContext(context.Background(), httpClient, url, body, opt)
+	ctx, cancel := context.WithTimeout(context.Background(), 20 * time.Second)
+	defer cancel()
+
+	return sendWithContext(ctx, httpClient, url, body, opt)
 }
 
 // Sending an HTTP request and accepting context.
